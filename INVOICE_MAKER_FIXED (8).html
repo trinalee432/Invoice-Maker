@@ -1,0 +1,2211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Trina Lee · Invoice Maker</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --ink: #1a1a2e;
+  --ink2: #3d3d5c;
+  --muted: #8888aa;
+  --border: #e4e4f0;
+  --bg: #f7f7fc;
+  --card: #ffffff;
+  --accent: #6c5ce7;
+  --accent2: #a29bfe;
+  --accent-pale: #f0eeff;
+  --green: #00b894;
+  --green-pale: #e0faf4;
+  --red: #e17055;
+  --red-pale: #fdf0ec;
+  --yellow: #fdcb6e;
+  --yellow-pale: #fef9ec;
+  --radius: 16px;
+  --shadow: 0 4px 24px rgba(108,92,231,0.08);
+  --shadow-lg: 0 12px 48px rgba(108,92,231,0.14);
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+}
+
+/* ── APP LAYOUT ── */
+.app-wrap {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  min-height: 100vh;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  background: var(--ink);
+  color: #fff;
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.sidebar-logo {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.4rem;
+  color: #fff;
+  margin-bottom: 4px;
+}
+.sidebar-sub {
+  font-size: 0.72rem;
+  color: var(--accent2);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 32px;
+}
+
+.sidebar-section {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent2);
+  margin-bottom: 10px;
+  margin-top: 24px;
+}
+
+.nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.65);
+  transition: all 0.15s;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+}
+.nav-btn:hover { background: rgba(255,255,255,0.07); color: #fff; }
+.nav-btn.active { background: var(--accent); color: #fff; font-weight: 600; }
+.nav-btn .icon { font-size: 1rem; width: 20px; text-align: center; }
+
+.sidebar-divider {
+  height: 1px;
+  background: rgba(255,255,255,0.08);
+  margin: 20px 0;
+}
+
+.tutor-card {
+  margin-top: auto;
+  background: rgba(255,255,255,0.06);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+.tutor-name { font-size: 0.9rem; font-weight: 600; color: #fff; }
+.tutor-role { font-size: 0.75rem; color: var(--accent2); margin-top: 2px; }
+
+/* ── MAIN ── */
+.main {
+  padding: 40px 48px;
+  overflow-y: auto;
+}
+
+.page { display: none; }
+.page.active { display: block; }
+
+/* ── PAGE HEADER ── */
+.page-header {
+  margin-bottom: 32px;
+}
+.page-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 2rem;
+  color: var(--ink);
+  line-height: 1.1;
+}
+.page-subtitle {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-top: 6px;
+}
+
+/* ── CARDS ── */
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  padding: 28px;
+}
+
+/* ── FORM ELEMENTS ── */
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.form-row.full { grid-template-columns: 1fr; }
+.form-row.three { grid-template-columns: 1fr 1fr 1fr; }
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.field input, .field select, .field textarea {
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: var(--ink);
+  background: #fff;
+  transition: border-color 0.15s;
+  outline: none;
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  border-color: var(--accent);
+}
+.field textarea { resize: vertical; min-height: 70px; }
+
+/* ── BUTTONS ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 22px;
+  border-radius: 50px;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s;
+}
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: #5a4bd1; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(108,92,231,0.3); }
+.btn-ghost { background: none; border: 1.5px solid var(--border); color: var(--ink2); }
+.btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+.btn-danger { background: var(--red-pale); color: var(--red); border: 1.5px solid transparent; }
+.btn-danger:hover { background: var(--red); color: #fff; }
+.btn-green { background: var(--green); color: #fff; }
+.btn-green:hover { background: #00a381; transform: translateY(-1px); }
+.btn-save-big{background:#1a1a2e;color:#fff;border:none;border-radius:10px;padding:12px 24px;font-family:inherit;font-size:0.95rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .15s;}
+.btn-save-big:hover{background:#6c5ce7;}
+.btn-accent{background:var(--accent-pale);color:var(--accent);border:1.5px solid var(--accent2);border-radius:8px;padding:7px 14px;font-family:inherit;font-size:0.82rem;font-weight:700;cursor:pointer;transition:all .15s;}
+.btn-accent:hover{background:var(--accent);color:#fff;border-color:var(--accent);}
+.btn-sm { padding: 7px 14px; font-size: 0.8rem; }
+
+/* ── CLIENT LIST ── */
+.client-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-top: 24px; }
+.client-card {
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+.client-card:hover { border-color: var(--accent); box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+.client-card.selected { border-color: var(--accent); background: var(--accent-pale); }
+.client-initial {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  background: var(--accent);
+  color: #fff;
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+.client-name { font-weight: 700; font-size: 1rem; color: var(--ink); }
+.client-subject { font-size: 0.82rem; color: var(--muted); margin-top: 3px; }
+.client-rate { font-size: 0.82rem; color: var(--accent); font-weight: 700; margin-top: 8px; }
+.client-actions { position: absolute; top: 14px; right: 14px; display: flex; gap: 6px; opacity: 0; transition: opacity 0.15s; }
+.client-card:hover .client-actions { opacity: 1; }
+.icon-btn { background: none; border: none; cursor: pointer; padding: 4px 6px; border-radius: 6px; font-size: 0.85rem; color: var(--muted); transition: all 0.15s; }
+.icon-btn:hover { background: var(--border); color: var(--ink); }
+.icon-btn.del:hover { background: var(--red-pale); color: var(--red); }
+
+/* ── INVOICE BUILDER ── */
+.lesson-row {
+  display: grid;
+  grid-template-columns: 160px 1fr auto auto 36px;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.lesson-row:last-child { border-bottom: none; }
+.lesson-row input {
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-family: inherit;
+  font-size: 0.86rem;
+  color: var(--ink);
+  outline: none;
+  width: 100%;
+}
+.lesson-row input:focus { border-color: var(--accent); }
+.lesson-row .del-row {
+  background: none; border: none; cursor: pointer;
+  color: var(--muted); font-size: 1rem; padding: 4px;
+  border-radius: 6px; transition: all 0.15s;
+}
+.lesson-row .del-row:hover { background: var(--red-pale); color: var(--red); }
+
+.lesson-header {
+  display: grid;
+  grid-template-columns: 160px 1fr auto auto 36px;
+  gap: 10px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 4px;
+}
+.lesson-header span { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+
+.invoice-total-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+  gap: 12px;
+  align-items: center;
+}
+.total-box {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 14px;
+  padding: 16px 24px;
+  text-align: right;
+}
+.total-label { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.8; }
+.total-amount { font-family: 'DM Serif Display', serif; font-size: 2rem; line-height: 1.1; margin-top: 2px; }
+
+/* ── INVOICE PREVIEW ── */
+#invoice-preview {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-top: 32px;
+  box-shadow: var(--shadow-lg);
+  max-width: 740px;
+}
+.inv-top-bar {
+  background: var(--ink);
+  padding: 26px 36px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.inv-top-bar .brand { font-family: 'DM Serif Display', serif; font-size: 1.4rem; color: #fff; }
+.inv-top-bar .brand-sub { font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 2px; }
+.inv-top-bar .inv-label { text-align: right; }
+.inv-top-bar .inv-label .word { font-size: 0.6rem; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent2); }
+.inv-top-bar .inv-label .num { font-family: 'DM Serif Display', serif; font-size: 1.5rem; color: #fff; line-height: 1.1; }
+.inv-body { padding: 28px 36px 0; }
+.inv-parties {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+  padding-bottom: 22px;
+  border-bottom: 1.5px solid var(--border);
+}
+.inv-party-block .lbl { font-size: 0.6rem; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
+.inv-party-block .val { font-size: 0.84rem; color: var(--ink); line-height: 1.55; font-weight: 500; }
+.inv-party-block .val strong { display: block; font-size: 0.9rem; font-weight: 700; }
+.inv-tbl { width: 100%; border-collapse: collapse; }
+.inv-tbl thead tr { background: var(--bg); }
+.inv-tbl th { font-size: 0.6rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); padding: 9px 12px; text-align: left; border-top: 1.5px solid var(--border); border-bottom: 1.5px solid var(--border); }
+.inv-tbl th:nth-child(2), .inv-tbl th:nth-child(3), .inv-tbl th:last-child { text-align: right; }
+.inv-tbl td { padding: 10px 12px; font-size: 0.84rem; color: var(--ink); border-bottom: 1px solid var(--border); vertical-align: middle; }
+.inv-tbl td:nth-child(2), .inv-tbl td:nth-child(3), .inv-tbl td:last-child { text-align: right; }
+.inv-tbl td:last-child { font-weight: 700; }
+.inv-tbl .date-chip { display: inline-block; background: var(--accent-pale); color: var(--accent); font-size: 0.7rem; font-weight: 700; padding: 2px 7px; border-radius: 4px; margin-right: 6px; white-space: nowrap; }
+.inv-tbl .desc-sub { font-size: 0.78rem; color: var(--muted); }
+.inv-tbl tr:last-child td { border-bottom: none; }
+.inv-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 18px 36px 24px;
+  border-top: 1.5px solid var(--border);
+  background: var(--bg);
+}
+.inv-payment .lbl { font-size: 0.6rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+.inv-payment .val { font-size: 0.8rem; color: var(--ink2); line-height: 1.55; max-width: 280px; }
+.inv-total-block { text-align: right; }
+.inv-total-block .lbl { font-size: 0.6rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+.inv-total-block .amount { font-family: 'DM Serif Display', serif; font-size: 2rem; color: var(--ink); line-height: 1; }
+.inv-total-block .amount .cur { font-size: 0.9rem; font-family: 'DM Sans', sans-serif; font-weight: 600; color: var(--muted); margin-right: 3px; }
+.inv-due-chip { display: inline-block; background: #fff8e6; color: #8a6200; font-size: 0.68rem; font-weight: 700; padding: 3px 9px; border-radius: 50px; margin-top: 5px; border: 1px solid #f0d890; }
+.inv-foot { background: var(--ink); padding: 9px 36px; display: flex; justify-content: space-between; align-items: center; }
+.inv-foot .ft { font-size: 0.68rem; color: rgba(255,255,255,0.3); }
+.inv-foot .ft-name { font-size: 0.68rem; color: rgba(255,255,255,0.45); font-weight: 600; }
+
+/* ── DASHBOARD STATS ── */
+.stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+}
+.stat-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 8px; }
+.stat-value { font-family: 'DM Serif Display', serif; font-size: 1.8rem; color: var(--ink); }
+.stat-sub { font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
+
+/* ── INVOICE HISTORY ── */
+.inv-list { display: flex; flex-direction: column; gap: 10px; }
+.inv-item {
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: all 0.15s;
+}
+.inv-item:hover { border-color: var(--accent); box-shadow: var(--shadow); }
+.inv-num { font-family: 'DM Serif Display', serif; font-size: 1rem; color: var(--accent); min-width: 80px; }
+.inv-client-name { font-weight: 600; font-size: 0.92rem; flex: 1; }
+.inv-period { font-size: 0.8rem; color: var(--muted); }
+.inv-amount { font-weight: 700; font-size: 1rem; color: var(--ink); min-width: 80px; text-align: right; }
+.inv-status {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 50px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.status-paid { background: var(--green-pale); color: var(--green); }
+.status-pending { background: var(--yellow-pale); color: #b07d00; }
+
+.empty-state {
+  text-align: center;
+  padding: 60px 40px;
+  color: var(--muted);
+}
+.empty-state .emo { font-size: 2.5rem; margin-bottom: 12px; }
+.empty-state p { font-size: 0.9rem; line-height: 1.6; }
+
+/* ── MODAL ── */
+.modal-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(26,26,46,0.5);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--card);
+  border-radius: 20px;
+  padding: 32px;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: var(--shadow-lg);
+}
+.modal-title { font-family: 'DM Serif Display', serif; font-size: 1.4rem; margin-bottom: 6px; }
+.modal-sub { font-size: 0.85rem; color: var(--muted); margin-bottom: 24px; }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
+
+/* ── ATTENDANCE CALENDAR ── */
+.att-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+.att-cal-day-label{text-align:center;font-size:0.65rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);padding-bottom:6px;}
+.att-cal-day{aspect-ratio:1;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:0.85rem;font-weight:600;cursor:pointer;border:2px solid transparent;transition:all .15s;background:#fff;color:var(--ink);}
+.att-cal-day:hover{border-color:var(--accent);color:var(--accent);}
+.att-cal-day.empty{cursor:default;background:transparent;}
+.att-cal-day.empty:hover{border-color:transparent;}
+.att-cal-day.today{border-color:var(--accent2);color:var(--accent);}
+.att-cal-day.marked{background:var(--accent);color:#fff;border-color:var(--accent);}
+.att-cal-day.marked:hover{background:#5a4bd1;border-color:#5a4bd1;}
+.att-cal-day.other-student{background:var(--accent-pale);color:var(--accent);border-color:var(--accent2);}
+.att-pill{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:50px;border:2px solid var(--border);background:#fff;font-size:0.82rem;font-weight:600;cursor:pointer;transition:all .15s;color:var(--ink);}
+.att-pill:hover{border-color:var(--accent);color:var(--accent);}
+.att-pill.selected{background:var(--accent);border-color:var(--accent);color:#fff;}
+.att-session-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);}
+.att-session-row:last-child{border-bottom:none;}
+.att-session-date{font-size:0.85rem;font-weight:600;color:var(--ink);}
+.att-session-student{font-size:0.8rem;color:var(--muted);}
+.att-session-del{background:none;border:none;cursor:pointer;color:var(--muted);font-size:1rem;padding:2px 6px;border-radius:6px;transition:all .15s;}
+.att-session-del:hover{color:var(--red);background:var(--red-pale);}
+/* ── HISTORY MONTH GROUPS ── */
+.month-tab{padding:7px 16px;border-radius:50px;border:1.5px solid var(--border);background:#fff;font-family:inherit;font-size:0.8rem;font-weight:600;color:var(--muted);cursor:pointer;transition:all .15s;}
+.month-tab:hover{border-color:var(--accent);color:var(--accent);}
+.month-tab.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.hist-month-section{margin-bottom:28px;}
+.hist-month-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px;padding-bottom:8px;border-bottom:2px solid var(--border);}
+.hist-month-name{font-family:'DM Serif Display',serif;font-size:1.15rem;color:var(--dark);}
+.hist-month-meta{font-size:0.78rem;color:var(--muted);font-weight:500;}
+.hist-stat{background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:12px 18px;min-width:130px;}
+.hist-stat-paid{border-color:#b2f0e0;background:#f0fdf9;}
+.hist-stat-pending{border-color:#fde8a8;background:#fffbee;}
+.hist-stat-label{font-size:0.62rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;}
+.hist-stat-val{font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--dark);}
+.hist-stat-paid .hist-stat-val{color:#00845f;}
+.hist-stat-pending .hist-stat-val{color:#8a6200;}
+.toast {
+  position: fixed;
+  bottom: 28px; right: 28px;
+  background: var(--ink);
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  box-shadow: var(--shadow-lg);
+  z-index: 2000;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.25s;
+  pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+
+/* ── PRINT ── */
+@media print {
+  body * { visibility: hidden; }
+  #print-area, #print-area * { visibility: visible; }
+  #print-area {
+    position: fixed;
+    inset: 0;
+    background: #fff;
+    z-index: 99999;
+  }
+  #print-area #invoice-preview {
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
+    max-width: 100%;
+    margin: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  /* ── LAYOUT ── */
+  .app-wrap { grid-template-columns: 1fr; min-height: 100vh; }
+
+  /* ── SIDEBAR → BOTTOM NAV ── */
+  .sidebar {
+    position: fixed; bottom: 0; left: 0; right: 0; top: auto;
+    height: auto; width: 100%;
+    flex-direction: row; flex-wrap: nowrap;
+    padding: 8px 4px env(safe-area-inset-bottom);
+    gap: 0; z-index: 1000;
+    overflow-x: auto; overflow-y: hidden;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    justify-content: space-around;
+  }
+  .sidebar-logo, .sidebar-sub, .sidebar-section, .sidebar-divider, .tutor-card { display: none; }
+  .nav-btn {
+    flex-direction: column; gap: 3px;
+    padding: 6px 8px; border-radius: 10px;
+    font-size: 0.62rem; min-width: 52px;
+    flex: 1; max-width: 72px;
+    white-space: nowrap; overflow: hidden;
+  }
+  .nav-btn .icon { font-size: 1.3rem; }
+  .nav-btn.active { background: rgba(255,255,255,0.15); }
+
+  /* ── MAIN ── */
+  .main {
+    padding: 16px 14px 90px; /* bottom padding for nav bar */
+  }
+
+  /* ── CARDS ── */
+  .card { padding: 16px 14px; border-radius: 12px; }
+  .page-title { font-size: 1.4rem; }
+  .page-header { margin-bottom: 16px; }
+
+  /* ── DASHBOARD STATS ── */
+  .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .stat-card { padding: 14px 12px; }
+
+  /* ── CLIENT CARDS ── */
+  .clients-grid { grid-template-columns: 1fr; gap: 12px; }
+
+  /* ── LESSON ROWS ── */
+  .lesson-header { display: none; }
+  .lesson-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 12px;
+    background: var(--bg);
+    border-radius: 10px;
+    margin-bottom: 8px;
+    position: relative;
+  }
+  .lesson-row input[type="date"] { grid-column: 1 / -1; }
+  .lesson-row .lesson-desc { grid-column: 1 / -1; }
+  .lesson-row .del-row {
+    position: absolute; top: 8px; right: 8px;
+    padding: 4px 8px;
+  }
+
+  /* ── FORM ROWS ── */
+  .form-row { grid-template-columns: 1fr; gap: 10px; }
+  .form-row.full { grid-template-columns: 1fr; }
+
+  /* ── MODAL ── */
+  .modal-overlay { align-items: flex-end; padding: 0; }
+  .modal {
+    border-radius: 20px 20px 0 0;
+    max-height: 92vh;
+    overflow-y: auto;
+    width: 100%;
+    padding: 20px 16px 32px;
+    margin: 0;
+  }
+
+  /* ── HISTORY ── */
+  .hist-stat { min-width: 0; flex: 1; padding: 10px 12px; }
+  .hist-stat-val { font-size: 1rem; }
+  #history-summary { gap: 8px; }
+  .inv-item { flex-wrap: wrap; gap: 6px; padding: 12px; }
+
+  /* ── ATTENDANCE CALENDAR ── */
+  .att-cal-day { font-size: 0.75rem; border-radius: 8px; }
+  .att-cal-day-label { font-size: 0.55rem; }
+  .att-cal-grid { gap: 4px; }
+
+  /* ── BUTTONS ── */
+  .btn { padding: 10px 16px; font-size: 0.85rem; }
+  .btn-sm { padding: 8px 12px; font-size: 0.8rem; }
+  .invoice-actions { flex-wrap: wrap; }
+  .invoice-actions .btn { flex: 1; text-align: center; }
+
+  /* ── MONTH TABS ── */
+  #history-month-tabs { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; }
+  .month-tab { white-space: nowrap; flex-shrink: 0; }
+
+  /* ── PREVIEW ACTIONS ── */
+  #preview-actions .btn { width: 100%; justify-content: center; }
+  .btn-save-big { width: 100%; text-align: center; }
+
+  /* Show settings in bottom nav on mobile */
+  #nav-settings-mobile { display: flex !important; }
+  /* Hide desktop-only settings nav item */
+  .sidebar-section ~ .nav-btn[id="nav-settings"] { display: none; }
+  /* Nav label font */
+  .nav-label { font-size: 0.6rem; }
+  /* ── INV PARTIES (3-col → stacked) ── */
+  .inv-parties { grid-template-columns: 1fr !important; gap: 12px !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="app-wrap">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">Trina Lee</div>
+    <div class="sidebar-sub">Invoice Manager</div>
+
+    <div class="sidebar-section">Menu</div>
+    <button class="nav-btn active" onclick="showPage('dashboard')" id="nav-dashboard">
+      <span class="icon">📊</span> <span class="nav-label">Dashboard</span>
+    </button>
+    <button class="nav-btn" onclick="showPage('clients')" id="nav-clients">
+      <span class="icon">👤</span> <span class="nav-label">Students</span>
+    </button>
+    <button class="nav-btn" onclick="showPage('new-invoice')" id="nav-new-invoice">
+      <span class="icon">✏️</span> <span class="nav-label">Invoice</span>
+    </button>
+    <button class="nav-btn" onclick="showPage('history')" id="nav-history">
+      <span class="icon">🗂️</span> <span class="nav-label">History</span>
+    </button>
+    <button class="nav-btn" onclick="showPage('attendance')" id="nav-attendance">
+      <span class="icon">📅</span> <span class="nav-label">Attendance</span>
+    </button>
+    <button class="nav-btn" onclick="showPage('settings')" id="nav-settings-mobile" style="display:none;">
+      <span class="icon">⚙️</span> <span class="nav-label">Settings</span>
+    </button>
+
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">Settings</div>
+    <button class="nav-btn" onclick="showPage('settings')" id="nav-settings">
+      <span class="icon">⚙️</span> My Details
+    </button>
+
+    <div class="tutor-card" style="margin-top:auto;">
+      <div class="tutor-name">Trina Lee</div>
+      <div class="tutor-role">Private Tutor · Singapore</div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ── DASHBOARD ── -->
+    <div id="page-dashboard" class="page active">
+      <div class="page-header">
+        <div class="page-title">Good to see you, Trina 👋</div>
+        <div class="page-subtitle">Here's your invoicing overview.</div>
+      </div>
+      <div class="stats-row" id="dashboard-stats">
+        <div class="stat-card">
+          <div class="stat-label">Total Students</div>
+          <div class="stat-value" id="stat-clients">0</div>
+          <div class="stat-sub">saved profiles</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Invoices Sent</div>
+          <div class="stat-value" id="stat-invoices">0</div>
+          <div class="stat-sub">all time</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Billed</div>
+          <div class="stat-value" id="stat-total">$0</div>
+          <div class="stat-sub">across all invoices</div>
+        </div>
+      </div>
+      <div class="card">
+        <div style="font-weight:700;font-size:1rem;margin-bottom:16px;">Recent Invoices</div>
+        <div id="dashboard-recent"></div>
+      </div>
+    </div>
+
+    <!-- ── CLIENTS ── -->
+    <div id="page-clients" class="page">
+      <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div>
+          <div class="page-title">My Students</div>
+          <div class="page-subtitle">Save a profile once, use it every invoice.</div>
+        </div>
+        <button class="btn btn-primary" onclick="openClientModal()">+ Add Student</button>
+      </div>
+      <div class="client-grid" id="client-grid">
+        <div class="empty-state" style="grid-column:1/-1;">
+          <div class="emo">👤</div>
+          <p>No students yet.<br/>Add your first student to get started.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── NEW INVOICE ── -->
+    <div id="page-new-invoice" class="page">
+      <div class="page-header">
+        <div class="page-title">New Invoice</div>
+        <div class="page-subtitle">Pick a student, add lessons, generate.</div>
+      </div>
+
+      <!-- Step 1: pick client(s) -->
+      <div class="card" style="margin-bottom:20px;">
+        <div style="font-weight:700;font-size:0.95rem;margin-bottom:14px;">1 · Select Student(s)</div>
+        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:12px;">
+          <select id="inv-client-select" style="flex:1;border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;font-family:inherit;font-size:0.9rem;outline:none;min-width:200px;">
+            <option value="">— add a student —</option>
+          </select>
+          <button class="btn btn-ghost btn-sm" onclick="addStudentToInvoice()">+ Add</button>
+        </div>
+        <div id="selected-students-list" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+      </div>
+
+      <!-- Step 2: invoice details -->
+      <div class="card" style="margin-bottom:20px;">
+        <div style="font-weight:700;font-size:0.95rem;margin-bottom:16px;">2 · Invoice Details</div>
+        <div class="form-row three">
+          <div class="field">
+            <label>Invoice No.</label>
+            <input type="text" id="inv-number" placeholder="e.g. INV-001" readonly style="background:#f7f7fc;color:var(--muted);"/>
+          </div>
+          <div class="field">
+            <label>Invoice Month</label>
+            <input type="month" id="inv-month"/>
+          </div>
+          <div class="field">
+            <label>Due Date</label>
+            <input type="date" id="inv-due"/>
+          </div>
+        </div>
+        <div class="form-row full">
+          <div class="field">
+            <label>Notes (optional)</label>
+            <textarea id="inv-notes" placeholder="e.g. Thank you for this month! Payment via PayNow to +65 9XXX XXXX."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: lessons -->
+      <div class="card lesson-builder" style="margin-bottom:20px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+          <div style="font-weight:700;font-size:0.95rem;">3 · Lesson Dates &amp; Rates</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-accent btn-sm" onclick="importFromAttendance()" title="Pull dates & hours from your Attendance log">📅 Import from Attendance</button>
+            <button class="btn btn-ghost btn-sm" id="add-lesson-btn" onclick="addLessonRow()">+ Add Lesson</button>
+          </div>
+        </div>
+        <div class="lesson-header">
+          <span>Date</span><span>Description</span><span style="text-align:right;">Rate (S$)</span><span style="text-align:right;">Hours / Qty</span><span></span>
+        </div>
+        <div id="lessons-container"></div>
+        <div class="invoice-total-row">
+          <div>
+            <div style="font-size:0.78rem;color:var(--muted);text-align:right;margin-bottom:6px;">TOTAL</div>
+            <div class="total-box">
+              <div class="total-label">Amount Due</div>
+              <div class="total-amount" id="live-total">S$0.00</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="invoice-actions" style="display:flex;gap:12px;justify-content:flex-end;margin-bottom:40px;">
+        <button class="btn btn-ghost" onclick="resetInvoice()">Clear</button>
+        <button class="btn btn-primary" onclick="generateInvoice()">Generate Invoice →</button>
+      </div>
+
+      <!-- Preview -->
+      <div id="invoice-preview" style="display:none;">
+        <!-- rendered by JS -->
+      </div>
+      <div id="preview-actions" style="display:none;flex-direction:column;gap:12px;margin-top:24px;">
+        <div style="background:#fff8e6;border:2px solid #f0c84a;border-radius:12px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:1.3rem;">⚠️</span>
+            <div>
+              <div style="font-weight:700;font-size:0.9rem;color:#7a5000;">Invoice not saved yet!</div>
+              <div style="font-size:0.8rem;color:#9a6800;margin-top:1px;">Save it to History so it's recorded and the number advances.</div>
+            </div>
+          </div>
+          <button class="btn btn-save-big" onclick="saveInvoice()">💾 Save to History</button>
+        </div>
+        <div style="display:flex;gap:10px;justify-content:flex-end;">
+          <button class="btn btn-ghost" onclick="printCurrentInvoice()">🖨️ Print / Save PDF</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── HISTORY ── -->
+    <div id="page-history" class="page">
+      <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+        <div>
+          <div class="page-title">Invoice History</div>
+          <div class="page-subtitle">All your saved invoices, grouped by month.</div>
+        </div>
+        <button class="btn btn-accent" onclick="exportInvoicesCSV()" style="align-self:center;">⬇️ Export CSV</button>
+      </div>
+      <!-- Month filter tabs -->
+      <div id="history-month-tabs" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;"></div>
+      <!-- Summary bar -->
+      <div id="history-summary" style="display:flex;gap:16px;margin-bottom:20px;flex-wrap:wrap;"></div>
+      <!-- Invoice list -->
+      <div id="history-list"></div>
+    </div>
+
+    <!-- ── ATTENDANCE ── -->
+    <div id="page-attendance" class="page">
+      <div class="page-header">
+        <div class="page-title">Attendance</div>
+        <div class="page-subtitle">Tap dates to mark sessions taught.</div>
+      </div>
+
+      <!-- Student picker -->
+      <div class="card" style="margin-bottom:20px;">
+        <div style="font-weight:700;font-size:0.95rem;margin-bottom:12px;">Select Student</div>
+        <div id="att-student-pills" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+      </div>
+
+      <!-- Month nav + calendar -->
+      <div class="card" style="margin-bottom:20px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+          <button class="btn btn-ghost btn-sm" onclick="attPrevMonth()">← Prev</button>
+          <div id="att-month-label" style="font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--ink);"></div>
+          <button class="btn btn-ghost btn-sm" onclick="attNextMonth()">Next →</button>
+        </div>
+        <div id="att-calendar"></div>
+      </div>
+
+      <!-- Earnings estimate -->
+      <div class="card" id="att-earnings-card" style="margin-bottom:20px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+          <div style="font-weight:700;font-size:0.95rem;">💰 Estimated Earnings</div>
+          <button class="btn btn-ghost btn-sm" onclick="renderAttEarnings()">Calculate</button>
+        </div>
+        <div id="att-earnings-list"><div style="color:var(--muted);font-size:0.85rem;">Hit Calculate to see your estimated earnings for this month.</div></div>
+      </div>
+
+      <!-- This month summary -->
+      <div class="card" id="att-summary-card">
+        <div style="font-weight:700;font-size:0.95rem;margin-bottom:12px;" id="att-summary-title">Sessions this month</div>
+        <div id="att-summary-list"></div>
+      </div>
+    </div>
+
+    <!-- ── SETTINGS ── -->
+    <div id="page-settings" class="page">
+      <div class="page-header">
+        <div class="page-title">My Details</div>
+        <div class="page-subtitle">These appear on every invoice you generate.</div>
+      </div>
+      <div class="card" style="max-width:560px;">
+        <div class="form-row">
+          <div class="field">
+            <label>Full Name</label>
+            <input type="text" id="s-name" value="Trina Lee"/>
+          </div>
+          <div class="field">
+            <label>Phone / WhatsApp</label>
+            <input type="text" id="s-phone" placeholder="+65 9XXX XXXX"/>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label>Email</label>
+            <input type="email" id="s-email" placeholder="trina@email.com"/>
+          </div>
+          <div class="field">
+            <label>PayNow / Bank</label>
+            <input type="text" id="s-paynow" placeholder="e.g. PayNow to +65 9XXX XXXX"/>
+          </div>
+        </div>
+        <div class="form-row full">
+          <div class="field">
+            <label>Address / Area</label>
+            <input type="text" id="s-address" placeholder="e.g. Singapore"/>
+          </div>
+        </div>
+        <div class="form-row full">
+          <div class="field">
+            <label>Default Invoice Note</label>
+            <textarea id="s-note" placeholder="e.g. Thank you! Please transfer payment within 7 days."></textarea>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="saveSettings()">Save Details</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ADD/EDIT CLIENT MODAL -->
+<div class="modal-overlay" id="client-modal">
+  <div class="modal">
+    <div class="modal-title" id="client-modal-title">Add Student</div>
+    <div class="modal-sub">Save their details once — use every month.</div>
+    <input type="hidden" id="edit-client-id"/>
+    <div class="form-row">
+      <div class="field">
+        <label>Student Name *</label>
+        <input type="text" id="c-name" placeholder="e.g. Aiden Tan"/>
+      </div>
+      <div class="field">
+        <label>Parent Name</label>
+        <input type="text" id="c-parent" placeholder="e.g. Mrs Tan"/>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label>Subject(s)</label>
+        <input type="text" id="c-subject" placeholder="e.g. Secondary Maths"/>
+      </div>
+      <div class="field">
+        <label>Level</label>
+        <input type="text" id="c-level" placeholder="e.g. Sec 3"/>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label>Default Rate (S$)</label>
+        <input type="number" id="c-rate" placeholder="50" min="0" step="5"/>
+      </div>
+      <div class="field">
+        <label>Rate Type</label>
+        <select id="c-rate-type">
+          <option value="hr">per hour</option>
+          <option value="session">per session</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label>Default Session Hours</label>
+        <input type="number" id="c-default-hours" placeholder="1.5" min="0.5" max="8" step="0.5"/>
+      </div>
+      <div class="field"></div>
+    </div>
+    <div class="form-row full">
+      <div class="field">
+        <label>Parent Contact (email / phone)</label>
+        <input type="text" id="c-contact" placeholder="e.g. parent@email.com or +65 9XXX XXXX"/>
+      </div>
+    </div>
+    <div class="form-row full">
+      <div class="field">
+        <label>Billing Address</label>
+        <input type="text" id="c-address" placeholder="e.g. Blk 123 Tampines St 11, #04-56, Singapore 521123"/>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeClientModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveClient()">Save Student</button>
+    </div>
+  </div>
+</div>
+
+<!-- VIEW INVOICE MODAL -->
+<div class="modal-overlay" id="view-inv-modal">
+  <div class="modal" style="max-width:860px;max-height:90vh;overflow-y:auto;">
+    <div id="view-inv-content"></div>
+    <!-- Receipt banner — shown when paid -->
+    <div id="receipt-banner" style="display:none;background:#e8faf4;border:2px solid #00b894;border-radius:12px;padding:14px 18px;margin-top:16px;display:none;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:1.4rem;">✅</span>
+        <div>
+          <div style="font-weight:700;font-size:0.9rem;color:#00845f;">Payment received!</div>
+          <div style="font-size:0.8rem;color:#00a87a;margin-top:1px;">Generate a receipt to send to your client.</div>
+        </div>
+      </div>
+      <button class="btn btn-save-big" style="background:#00b894;" onclick="printReceipt()">🧾 Generate Receipt</button>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap;">
+      <button class="btn btn-ghost" onclick="closeViewInv()">Close</button>
+      <button class="btn btn-ghost" onclick="editInvoice()">✏️ Edit</button>
+      <button class="btn btn-ghost" onclick="printViewInv()">🖨️ Print Invoice</button>
+      <button class="btn btn-green btn-sm" id="mark-paid-btn" onclick="markPaid()">✓ Mark as Paid</button>
+    </div>
+  </div>
+</div>
+
+<div id="print-area" style="display:none;"></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── STORAGE HELPERS ──
+const _memStore = {};
+const db = {
+  get: k => {
+    try {
+      return JSON.parse(localStorage.getItem('tl_' + k) || 'null');
+    } catch(e) {
+      return _memStore[k] ?? null;
+    }
+  },
+  set: (k, v) => {
+    try {
+      localStorage.setItem('tl_' + k, JSON.stringify(v));
+    } catch(e) {}
+    _memStore[k] = v;
+  },
+};
+
+let clients = db.get('clients') || [];
+let invoices = db.get('invoices') || [];
+let settings = db.get('settings') || { name: 'Trina Lee', phone: '', email: '', paynow: '', address: 'Singapore', note: 'Thank you! Please transfer payment within 7 days of receipt.' };
+let invCounter = db.get('invCounter') || 1;
+let currentGeneratedInvoice = null;
+let viewingInvId = null;
+
+// ── NAV ──
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.getElementById('nav-' + id).classList.add('active');
+  if (id === 'dashboard') renderDashboard();
+  if (id === 'clients') renderClients();
+  if (id === 'new-invoice') initNewInvoice();
+  if (id === 'attendance') initAttendance();
+  if (id === 'history') renderHistory();
+  if (id === 'settings') loadSettings();
+}
+
+// ── TOAST ──
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ── DASHBOARD ──
+function renderDashboard() {
+  document.getElementById('stat-clients').textContent = clients.length;
+  document.getElementById('stat-invoices').textContent = invoices.length;
+  const total = invoices.reduce((s, i) => s + (i.total || 0), 0);
+  document.getElementById('stat-total').textContent = 'S$' + total.toFixed(0);
+  const recent = document.getElementById('dashboard-recent');
+  if (invoices.length === 0) {
+    recent.innerHTML = '<div class="empty-state"><div class="emo">📄</div><p>No invoices yet. Create your first one!</p></div>';
+    return;
+  }
+  const last5 = [...invoices].reverse().slice(0, 5);
+  recent.innerHTML = '<div class="inv-list">' + last5.map(inv => invItemHTML(inv)).join('') + '</div>';
+}
+
+// ── CLIENTS ──
+function renderClients() {
+  const grid = document.getElementById('client-grid');
+  if (clients.length === 0) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><div class="emo">👤</div><p>No students yet.<br/>Add your first student to get started.</p></div>';
+    return;
+  }
+  grid.innerHTML = clients.map(c => `
+    <div class="client-card" onclick="prefillInvoiceFromClient('${c.id}')">
+      <div class="client-actions">
+        <button class="icon-btn" onclick="event.stopPropagation();openClientModal('${c.id}')" title="Edit">✏️</button>
+        <button class="icon-btn del" onclick="event.stopPropagation();deleteClient('${c.id}')" title="Delete">🗑️</button>
+      </div>
+      <div class="client-initial">${c.name.charAt(0).toUpperCase()}</div>
+      <div class="client-name">${c.name}</div>
+      <div class="client-subject">${c.parent ? c.parent + ' · ' : ''}${c.subject || ''}${c.level ? ' · ' + c.level : ''}</div>
+      <div class="client-rate">${c.rate ? 'S$' + c.rate + '/' + (c.rateType === 'session' ? 'session' : 'hr') : 'Rate not set'}</div>
+    </div>`).join('');
+}
+
+function openClientModal(id) {
+  const modal = document.getElementById('client-modal');
+  document.getElementById('edit-client-id').value = id || '';
+  if (id) {
+    const c = clients.find(x => x.id === id);
+    document.getElementById('client-modal-title').textContent = 'Edit Student';
+    document.getElementById('c-name').value = c.name || '';
+    document.getElementById('c-parent').value = c.parent || '';
+    document.getElementById('c-subject').value = c.subject || '';
+    document.getElementById('c-level').value = c.level || '';
+    document.getElementById('c-rate').value = c.rate || '';
+    document.getElementById('c-rate-type').value = c.rateType || 'hr';
+    document.getElementById('c-default-hours').value = c.defaultHours || '';
+    document.getElementById('c-contact').value = c.contact || '';
+    document.getElementById('c-address').value = c.address || '';
+  } else {
+    document.getElementById('client-modal-title').textContent = 'Add Student';
+    ['c-name','c-parent','c-subject','c-level','c-rate','c-default-hours','c-contact','c-address'].forEach(f => document.getElementById(f).value = '');
+    document.getElementById('c-rate-type').value = 'hr';
+  }
+  modal.classList.add('open');
+}
+
+function closeClientModal() {
+  document.getElementById('client-modal').classList.remove('open');
+}
+
+function saveClient() {
+  const name = document.getElementById('c-name').value.trim();
+  if (!name) { toast('Please enter a student name.'); return; }
+  const id = document.getElementById('edit-client-id').value;
+  const data = {
+    id: id || 'c' + Date.now(),
+    name,
+    parent: document.getElementById('c-parent').value.trim(),
+    subject: document.getElementById('c-subject').value.trim(),
+    level: document.getElementById('c-level').value.trim(),
+    rate: document.getElementById('c-rate').value.trim(),
+    rateType: document.getElementById('c-rate-type').value,
+    defaultHours: parseFloat(document.getElementById('c-default-hours').value) || 1.5,
+    contact: document.getElementById('c-contact').value.trim(),
+    address: document.getElementById('c-address').value.trim(),
+  };
+  if (id) {
+    clients = clients.map(c => c.id === id ? data : c);
+  } else {
+    clients.push(data);
+  }
+  db.set('clients', clients);
+  closeClientModal();
+  renderClients();
+  populateClientSelect();
+  toast(id ? 'Student updated!' : 'Student saved!');
+}
+
+function deleteClient(id) {
+  if (!confirm('Remove this student?')) return;
+  clients = clients.filter(c => c.id !== id);
+  db.set('clients', clients);
+  renderClients();
+  populateClientSelect();
+  toast('Student removed.');
+}
+
+function prefillInvoiceFromClient(id) {
+  showPage('new-invoice');
+  setTimeout(() => {
+    // Full reset first
+    selectedStudentIds = [];
+    renderSelectedStudents();
+    document.getElementById('lessons-container').innerHTML = '';
+    document.getElementById('invoice-preview').style.display = 'none';
+    document.getElementById('preview-actions').style.display = 'none';
+    calcTotal();
+    // Then add this student
+    document.getElementById('inv-client-select').value = id;
+    addStudentToInvoice();
+  }, 50);
+}
+
+// ── INVOICE BUILDER ──
+function importFromAttendance() {
+  if (selectedStudentIds.length === 0) { toast('Pick a student first!'); return; }
+
+  const month = document.getElementById('inv-month').value; // yyyy-mm
+  if (!month) { toast('Set the invoice month first!'); return; }
+
+  attSessions = db.get('attSessions') || [];
+  let imported = 0;
+
+  selectedStudentIds.forEach(sid => {
+    const c = clients.find(x => x.id === sid);
+    const sessions = attSessions.filter(s => s.studentId === sid && s.date.startsWith(month));
+    if (sessions.length === 0) return;
+
+    // Remove existing rows for this student so we don't double-up
+    document.querySelectorAll(`.lesson-row[data-student="${sid}"]`).forEach(r => r.remove());
+
+    sessions.forEach(s => {
+      const container = document.getElementById('lessons-container');
+      const row = document.createElement('div');
+      row.className = 'lesson-row';
+      row.dataset.student = sid;
+      const studentLabel = selectedStudentIds.length > 1
+        ? `<div style="grid-column:1/-1;padding-top:6px;padding-bottom:2px;"><span style="font-size:0.7rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.06em;">${c ? c.name : ''}</span></div>`
+        : '';
+      const hrs = s.hours !== undefined ? s.hours : attDefaultHours(sid);
+      const rate = c ? (c.rate || '') : '';
+      const desc = c ? (c.subject || 'Tuition lesson') : 'Tuition lesson';
+      row.innerHTML = `${studentLabel}
+        <input type="date" class="lesson-date" value="${s.date}" oninput="calcTotal()"/>
+        <input type="text" class="lesson-desc" value="${desc}" oninput="calcTotal()"/>
+        <input type="number" class="lesson-rate" value="${rate}" placeholder="${rate || 50}" min="0" step="5" style="text-align:right;width:90px;" oninput="calcTotal()"/>
+        <input type="number" class="lesson-qty" value="${hrs}" min="0" step="0.5" style="text-align:right;width:80px;" oninput="calcTotal()"/>
+        <button class="del-row" onclick="this.closest('.lesson-row').remove();calcTotal()">✕</button>`;
+      container.appendChild(row);
+      imported++;
+    });
+  });
+
+  if (imported === 0) {
+    toast('No attendance found for this month — log sessions in Attendance first!');
+  } else {
+    calcTotal();
+    toast(`✓ Imported ${imported} session${imported > 1 ? 's' : ''} from Attendance!`);
+  }
+}
+
+function nextInvNumber() {
+  // Always derive from actual saved invoices so it never goes backwards or repeats
+  const used = new Set(invoices.map(i => i.invNum));
+  let n = invoices.length + 1;
+  let candidate;
+  do {
+    candidate = 'INV-' + String(n).padStart(3, '0');
+    n++;
+  } while (used.has(candidate));
+  return candidate;
+}
+
+function initNewInvoice() {
+  populateClientSelect();
+  selectedStudentIds = [];
+  renderSelectedStudents();
+  // Set defaults
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  document.getElementById('inv-month').value = `${yyyy}-${mm}`;
+  const due = new Date(today);
+  due.setDate(due.getDate() + 7);
+  document.getElementById('inv-due').value = due.toISOString().split('T')[0];
+  document.getElementById('inv-number').value = nextInvNumber();
+  if (document.getElementById('inv-notes').value === '' && settings.note) {
+    document.getElementById('inv-notes').value = settings.note;
+  }
+  document.getElementById('lessons-container').innerHTML = '';
+  document.getElementById('invoice-preview').style.display = 'none';
+  document.getElementById('preview-actions').style.display = 'none';
+  calcTotal();
+}
+
+function populateClientSelect() {
+  const sel = document.getElementById('inv-client-select');
+  sel.innerHTML = '<option value="">— add a student —</option>' +
+    clients.map(c => `<option value="${c.id}">${c.name}${c.level ? ' (' + c.level + ')' : ''}</option>`).join('');
+}
+
+// Multi-student selection
+let selectedStudentIds = [];
+
+function addStudentToInvoice() {
+  const sel = document.getElementById('inv-client-select');
+  const id = sel.value;
+  if (!id) { toast('Pick a student first.'); return; }
+  if (selectedStudentIds.includes(id)) { toast('Already added!'); return; }
+  selectedStudentIds.push(id);
+  sel.value = '';
+  renderSelectedStudents();
+  // Add a lesson row pre-filled for this student
+  const c = clients.find(x => x.id === id);
+  addLessonRow(c);
+  calcTotal();
+}
+
+function removeStudentFromInvoice(id) {
+  selectedStudentIds = selectedStudentIds.filter(x => x !== id);
+  renderSelectedStudents();
+  // remove lesson rows for this student
+  document.querySelectorAll(`.lesson-row[data-student="${id}"]`).forEach(r => r.remove());
+  calcTotal();
+}
+
+function renderSelectedStudents() {
+  const list = document.getElementById('selected-students-list');
+  if (selectedStudentIds.length === 0) {
+    list.innerHTML = '<span style="font-size:0.82rem;color:var(--muted);">No students added yet.</span>';
+    return;
+  }
+  list.innerHTML = selectedStudentIds.map(id => {
+    const c = clients.find(x => x.id === id);
+    if (!c) return '';
+    return `<div style="display:inline-flex;align-items:center;gap:6px;background:var(--accent-pale);border:1.5px solid var(--accent2);border-radius:50px;padding:5px 12px;font-size:0.82rem;font-weight:600;color:var(--accent);">
+      ${c.name}${c.level ? ' · ' + c.level : ''}
+      <button onclick="removeStudentFromInvoice('${id}')" style="background:none;border:none;cursor:pointer;color:var(--accent);font-size:1rem;line-height:1;padding:0 0 0 4px;">×</button>
+    </div>`;
+  }).join('');
+}
+
+function addLessonRow(c) {
+  if (!c && selectedStudentIds.length > 0) {
+    c = clients.find(x => x.id === selectedStudentIds[selectedStudentIds.length - 1]);
+  }
+  const container = document.getElementById('lessons-container');
+  const row = document.createElement('div');
+  row.className = 'lesson-row';
+  if (c) row.dataset.student = c.id;
+  // Show student label if multiple students selected
+  const studentLabel = (c && selectedStudentIds.length > 1) ? `<span style="font-size:0.7rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.06em;">${c.name}</span>` : '';
+  row.innerHTML = `
+    ${studentLabel ? `<div style="grid-column:1/-1;padding-top:6px;padding-bottom:2px;">${studentLabel}</div>` : ''}
+    <input type="date" class="lesson-date" oninput="calcTotal()"/>
+    <input type="text" class="lesson-desc" placeholder="${c ? (c.subject || 'Tuition lesson') : 'Tuition lesson'}" oninput="calcTotal()"/>
+    <input type="number" class="lesson-rate" placeholder="${c && c.rate ? c.rate : '50'}" min="0" step="5" style="text-align:right;width:90px;" oninput="calcTotal()" value="${c && c.rate ? c.rate : ''}"/>
+    <input type="number" class="lesson-qty" placeholder="${c && c.rateType === 'session' ? '1' : '1.5'}" min="0" step="0.5" style="text-align:right;width:80px;" oninput="calcTotal()" value=""/>
+    <button class="del-row" onclick="this.closest('.lesson-row').remove();calcTotal()">✕</button>`;
+  container.appendChild(row);
+  calcTotal();
+}
+
+function calcTotal() {
+  const rows = document.querySelectorAll('.lesson-row');
+  let total = 0;
+  rows.forEach(row => {
+    const rate = parseFloat(row.querySelector('.lesson-rate').value) || 0;
+    const qtyInput = row.querySelector('.lesson-qty');
+    const qty = qtyInput.value !== '' ? parseFloat(qtyInput.value) : parseFloat(qtyInput.placeholder) || 1;
+    total += rate * qty;
+  });
+  document.getElementById('live-total').textContent = 'S$' + total.toFixed(2);
+  return total;
+}
+
+function resetInvoice() {
+  document.getElementById('inv-client-select').value = '';
+  selectedStudentIds = [];
+  renderSelectedStudents();
+  document.getElementById('lessons-container').innerHTML = '';
+  document.getElementById('inv-notes').value = settings.note || '';
+  document.getElementById('invoice-preview').style.display = 'none';
+  document.getElementById('preview-actions').style.display = 'none';
+  calcTotal();
+}
+
+function generateInvoice() {
+  if (selectedStudentIds.length === 0) { toast('Please add at least one student first.'); return; }
+  const month = document.getElementById('inv-month').value;
+  const due = document.getElementById('inv-due').value;
+  const notes = document.getElementById('inv-notes').value.trim();
+  const invNum = document.getElementById('inv-number').value;
+
+  const rows = [...document.querySelectorAll('.lesson-row')];
+  const lessons = rows.map(row => {
+    const qtyInput = row.querySelector('.lesson-qty');
+    const qty = qtyInput.value !== '' ? parseFloat(qtyInput.value) : parseFloat(qtyInput.placeholder) || 1;
+    return {
+      studentId: row.dataset.student || selectedStudentIds[0],
+      date: row.querySelector('.lesson-date').value,
+      desc: row.querySelector('.lesson-desc').value || 'Tuition lesson',
+      rate: parseFloat(row.querySelector('.lesson-rate').value) || 0,
+      qty,
+    };
+  }).filter(l => l.rate > 0 || l.qty > 0);
+
+  if (lessons.length === 0) { toast('Please add at least one lesson.'); return; }
+  const total = lessons.reduce((s, l) => s + l.rate * l.qty, 0);
+  const monthLabel = month ? new Date(month + '-01').toLocaleDateString('en-SG', { month: 'long', year: 'numeric' }) : '';
+
+  // For multi-student, primary client is first selected (for billed-to parent)
+  const primaryClient = clients.find(x => x.id === selectedStudentIds[0]);
+  const allClients = selectedStudentIds.map(id => clients.find(x => x.id === id)).filter(Boolean);
+
+  currentGeneratedInvoice = {
+    clientId: selectedStudentIds[0],
+    client: primaryClient,
+    allClients,
+    invNum, month, monthLabel, due, lessons, total, notes,
+    status: 'pending', createdAt: new Date().toISOString()
+  };
+
+  const html = buildInvoiceHTML(currentGeneratedInvoice);
+  const preview = document.getElementById('invoice-preview');
+  preview.innerHTML = html;
+  preview.style.display = 'block';
+  const acts = document.getElementById('preview-actions');
+  acts.style.display = 'flex';
+  acts.style.flexDirection = 'column';
+  preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function buildInvoiceHTML(inv) {
+  // Merge with live client data so fields added after invoice creation (like address) still show
+  const liveClient = clients.find(x => x.id === inv.clientId) || {};
+  const c = { ...liveClient, ...inv.client, address: (inv.client && inv.client.address) || liveClient.address || '' };
+  const liveAllClients = inv.allClients
+    ? inv.allClients.map(sc => {
+        const live = clients.find(x => x.id === sc.id) || {};
+        return { ...live, ...sc, address: sc.address || live.address || '' };
+      })
+    : [c];
+  const s = settings;
+  const allClients = liveAllClients;
+  const isMulti = allClients.length > 1;
+  const dueFmt = inv.due ? new Date(inv.due).toLocaleDateString('en-SG', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+  const createdFmt = inv.createdAt ? new Date(inv.createdAt).toLocaleDateString('en-SG', { day: 'numeric', month: 'short', year: 'numeric' }) : new Date().toLocaleDateString('en-SG', { day: 'numeric', month: 'short', year: 'numeric' });
+
+  // Build rows, grouped by student if multi
+  let rows = '';
+  if (isMulti) {
+    allClients.forEach(sc => {
+      const studentLessons = inv.lessons.filter(l => l.studentId === sc.id || (!l.studentId && sc.id === c.id));
+      if (studentLessons.length === 0) return;
+      rows += `<tr><td colspan="4" style="padding:10px 12px 4px;font-size:0.7rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#6c5ce7;background:#f7f0ff;">${sc.name}${sc.subject ? ' · ' + sc.subject : ''}${sc.level ? ' · ' + sc.level : ''}</td></tr>`;
+      studentLessons.forEach(l => {
+        const dateFmt = l.date ? new Date(l.date + 'T00:00:00').toLocaleDateString('en-SG', { day: 'numeric', month: 'short' }) : '';
+        const rateLabel = sc.rateType === 'session' ? 'session' : 'hr';
+        const subtotal = l.rate * l.qty;
+        rows += `<tr>
+          <td>${dateFmt ? `<span class="date-chip">${dateFmt}</span>` : ''}<span class="desc-sub">${l.desc}</span></td>
+          <td>S$${l.rate.toFixed(2)}/${rateLabel}</td>
+          <td>${l.qty}</td>
+          <td>S$${subtotal.toFixed(2)}</td>
+        </tr>`;
+      });
+    });
+  } else {
+    inv.lessons.forEach(l => {
+      const dateFmt = l.date ? new Date(l.date + 'T00:00:00').toLocaleDateString('en-SG', { day: 'numeric', month: 'short' }) : '';
+      const rateLabel = c.rateType === 'session' ? 'session' : 'hr';
+      const subtotal = l.rate * l.qty;
+      rows += `<tr>
+        <td>${dateFmt ? `<span class="date-chip">${dateFmt}</span>` : ''}<span class="desc-sub">${l.desc}</span></td>
+        <td>S$${l.rate.toFixed(2)}/${rateLabel}</td>
+        <td>${l.qty}</td>
+        <td>S$${subtotal.toFixed(2)}</td>
+      </tr>`;
+    });
+  }
+
+  const paymentInfo = [s.paynow, s.phone, s.email].filter(Boolean).join('<br/>');
+  const noteText = inv.notes || '';
+
+  // "For" block — list all students if multi
+  const forBlock = isMulti
+    ? `<strong>${allClients.map(sc => sc.name).join(', ')}</strong>${inv.monthLabel ? '<br/>' + inv.monthLabel : ''}`
+    : `<strong>${c.subject || 'Tuition'}</strong>${c.level ? '<br/>' + c.level : ''}${inv.monthLabel ? '<br/>' + inv.monthLabel : ''}`;
+
+  // "Billed To" — use shared parent if all have same parent, else list parent of first
+  const sharedParent = allClients.every(sc => sc.parent && sc.parent === allClients[0].parent) ? allClients[0].parent : (c.parent || '');
+  const billedToName = sharedParent || c.name;
+  const billedToSub = isMulti
+    ? (sharedParent ? allClients.map(sc => sc.name).join(', ') + '<br/>' : '') + (c.contact || '') + (c.address ? '<br/>' + c.address : '')
+    : (c.parent ? c.name + '<br/>' : '') + (c.contact || '') + (c.address ? '<br/>' + c.address : '');
+
+  return `<div class="inv-top-bar">
+    <div>
+      <div class="brand">${s.name || 'Trina Lee'}</div>
+      <div class="brand-sub">Private Tutor${s.address ? ' · ' + s.address : ''}</div>
+    </div>
+    <div class="inv-label">
+      <div class="word">Invoice</div>
+      <div class="num">${inv.invNum}</div>
+    </div>
+  </div>
+
+  <div class="inv-body">
+    <div class="inv-parties">
+      <div class="inv-party-block">
+        <div class="lbl">Billed To</div>
+        <div class="val">
+          <strong>${billedToName}</strong>
+          ${billedToSub}
+        </div>
+      </div>
+      <div class="inv-party-block">
+        <div class="lbl">For</div>
+        <div class="val">${forBlock}</div>
+      </div>
+      <div class="inv-party-block" style="text-align:right;">
+        <div class="lbl">Date Issued</div>
+        <div class="val"><strong>${createdFmt}</strong>${dueFmt ? '<br/>Due ' + dueFmt : ''}</div>
+      </div>
+    </div>
+
+    <table class="inv-tbl">
+      <thead><tr>
+        <th>Lesson</th>
+        <th style="text-align:right;">Rate</th>
+        <th style="text-align:right;">Qty</th>
+        <th style="text-align:right;">Amount</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>
+
+  <div class="inv-bottom">
+    <div class="inv-payment">
+      <div class="lbl">Payment Info</div>
+      <div class="val">${paymentInfo || 'Contact tutor for payment details'}${noteText ? '<br/><br/><em>' + noteText + '</em>' : ''}</div>
+    </div>
+    <div class="inv-total-block">
+      <div class="lbl">Total Due</div>
+      <div class="amount"><span class="cur">S$</span>${inv.total.toFixed(2)}</div>
+      ${dueFmt ? `<div class="inv-due-chip">Due ${dueFmt}</div>` : ''}
+    </div>
+  </div>
+
+  <div class="inv-foot">
+    <div class="ft">Thank you for your continued support.</div>
+    <div class="ft-name">${s.name || 'Trina Lee'} · Private Tutor</div>
+  </div>`;
+}
+
+function saveInvoice() {
+  if (!currentGeneratedInvoice) return;
+  const inv = { ...currentGeneratedInvoice, id: 'inv' + Date.now() };
+  invoices.push(inv);
+  db.set('invoices', invoices);
+  invCounter = invoices.length + 1;
+  db.set('invCounter', invCounter);
+  currentGeneratedInvoice = null;
+  toast('Invoice saved to history! ✓');
+  // Replace warning banner with saved confirmation
+  const acts = document.getElementById('preview-actions');
+  acts.innerHTML = `
+    <div style="background:#e8faf4;border:2px solid #00b894;border-radius:12px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:1.3rem;">✅</span>
+        <div>
+          <div style="font-weight:700;font-size:0.9rem;color:#00845f;">Saved to History!</div>
+          <div style="font-size:0.8rem;color:#00a87a;margin-top:1px;">${inv.invNum} · Next invoice will be ${nextInvNumber()}</div>
+        </div>
+      </div>
+      <button class="btn btn-ghost" onclick="printInvoiceHTML(buildInvoiceHTML(invoices.find(i=>i.id==='${inv.id}')))">🖨️ Print / Save PDF</button>
+    </div>`;
+  document.getElementById('inv-number').value = nextInvNumber();
+}
+
+// ── HISTORY ──
+function invItemHTML(inv) {
+  const names = inv.allClients ? inv.allClients.map(c => c.name).join(', ') : (inv.client ? inv.client.name : '—');
+  return `<div class="inv-item" onclick="viewInvoice('${inv.id}')" style="cursor:pointer;">
+    <div class="inv-num">${inv.invNum}</div>
+    <div>
+      <div class="inv-client-name">${names}</div>
+      <div class="inv-period">${inv.monthLabel || ''}</div>
+    </div>
+    <div style="flex:1;"></div>
+    <div class="inv-amount">S$${(inv.total||0).toFixed(2)}</div>
+    <div class="inv-status ${inv.status === 'paid' ? 'status-paid' : 'status-pending'}">${inv.status === 'paid' ? 'Paid' : 'Pending'}</div>
+  </div>`;
+}
+
+// ── HISTORY ──
+let historyFilterMonth = 'all';
+
+function renderHistory() {
+  const list = document.getElementById('history-list');
+  const tabsEl = document.getElementById('history-month-tabs');
+  const summaryEl = document.getElementById('history-summary');
+
+  if (invoices.length === 0) {
+    tabsEl.innerHTML = '';
+    summaryEl.innerHTML = '';
+    list.innerHTML = '<div class="empty-state"><div class="emo">🗂️</div><p>No invoices saved yet.</p></div>';
+    return;
+  }
+
+  // Build month groups from invoice.month (yyyy-mm) or createdAt
+  const getMonthKey = inv => {
+    if (inv.month) return inv.month;
+    if (inv.createdAt) return inv.createdAt.slice(0, 7);
+    return 'unknown';
+  };
+  const getMonthLabel = key => {
+    if (key === 'unknown') return 'Unknown';
+    const [y, m] = key.split('-');
+    return new Date(+y, +m - 1, 1).toLocaleDateString('en-SG', { month: 'long', year: 'numeric' });
+  };
+
+  // Get unique sorted months descending
+  const allMonths = [...new Set(invoices.map(getMonthKey))].sort().reverse();
+
+  // Build tabs
+  const tabs = [{ key: 'all', label: 'All' }, ...allMonths.map(k => ({ key: k, label: getMonthLabel(k) }))];
+  tabsEl.innerHTML = tabs.map(t => `
+    <button onclick="setHistoryMonth('${t.key}')" class="month-tab${historyFilterMonth === t.key ? ' active' : ''}">${t.label}</button>
+  `).join('');
+
+  // Filter
+  const filtered = historyFilterMonth === 'all'
+    ? [...invoices].reverse()
+    : [...invoices].filter(i => getMonthKey(i) === historyFilterMonth).reverse();
+
+  // Summary bar
+  const total = filtered.reduce((s, i) => s + (i.total || 0), 0);
+  const paid = filtered.filter(i => i.status === 'paid').reduce((s, i) => s + (i.total || 0), 0);
+  const pending = filtered.filter(i => i.status !== 'paid').reduce((s, i) => s + (i.total || 0), 0);
+  summaryEl.innerHTML = `
+    <div class="hist-stat"><div class="hist-stat-label">Total Invoiced</div><div class="hist-stat-val">S$${total.toFixed(2)}</div></div>
+    <div class="hist-stat hist-stat-paid"><div class="hist-stat-label">Collected</div><div class="hist-stat-val">S$${paid.toFixed(2)}</div></div>
+    <div class="hist-stat hist-stat-pending"><div class="hist-stat-label">Outstanding</div><div class="hist-stat-val">S$${pending.toFixed(2)}</div></div>
+    <div class="hist-stat"><div class="hist-stat-label">Invoices</div><div class="hist-stat-val">${filtered.length}</div></div>
+  `;
+
+  // Group by month for display
+  if (historyFilterMonth === 'all') {
+    const groups = {};
+    filtered.forEach(inv => {
+      const k = getMonthKey(inv);
+      if (!groups[k]) groups[k] = [];
+      groups[k].push(inv);
+    });
+    list.innerHTML = Object.entries(groups).map(([k, invs]) => {
+      const mTotal = invs.reduce((s, i) => s + (i.total || 0), 0);
+      const mPaid = invs.filter(i => i.status === 'paid').length;
+      return `<div class="hist-month-section">
+        <div class="hist-month-header">
+          <span class="hist-month-name">${getMonthLabel(k)}</span>
+          <span class="hist-month-meta">${invs.length} invoice${invs.length > 1 ? 's' : ''} · S$${mTotal.toFixed(2)} · ${mPaid} paid</span>
+        </div>
+        <div class="inv-list">${invs.map(i => invItemHTML(i)).join('')}</div>
+      </div>`;
+    }).join('');
+  } else {
+    list.innerHTML = '<div class="inv-list">' + filtered.map(i => invItemHTML(i)).join('') + '</div>';
+  }
+}
+
+function setHistoryMonth(key) {
+  historyFilterMonth = key;
+  renderHistory();
+}
+
+function viewInvoice(id) {
+  const inv = invoices.find(i => i.id === id);
+  if (!inv) return;
+  viewingInvId = id;
+  document.getElementById('view-inv-content').innerHTML = buildInvoiceHTML(inv);
+  const isPaid = inv.status === 'paid';
+  document.getElementById('mark-paid-btn').textContent = isPaid ? '✓ Paid' : '✓ Mark as Paid';
+  document.getElementById('mark-paid-btn').disabled = isPaid;
+  document.getElementById('receipt-banner').style.display = isPaid ? 'flex' : 'none';
+  document.getElementById('view-inv-modal').classList.add('open');
+}
+
+function closeViewInv() {
+  document.getElementById('view-inv-modal').classList.remove('open');
+}
+
+function printCurrentInvoice() {
+  if (!currentGeneratedInvoice) return;
+  printInvoiceHTML(buildInvoiceHTML(currentGeneratedInvoice));
+}
+
+function printInvoiceHTML(html) {
+  const win = window.open('', '_blank', 'width=900,height=700');
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"/>
+<title>Invoice</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+@page{margin:0;size:A4;}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:100%;height:100%;background:#fff;font-family:'DM Sans',sans-serif;}
+body{padding:0;margin:0;}
+#invoice-wrap{background:#fff;overflow:hidden;width:100%;min-height:100vh;display:flex;flex-direction:column;}
+.inv-top-bar{background:#1a1a2e;padding:26px 36px;display:flex;justify-content:space-between;align-items:center;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.inv-top-bar .brand{font-family:'DM Serif Display',serif;font-size:1.4rem;color:#fff;}
+.inv-top-bar .brand-sub{font-size:0.72rem;color:rgba(255,255,255,0.4);margin-top:2px;}
+.inv-top-bar .inv-label{text-align:right;}
+.inv-top-bar .inv-label .word{font-size:0.6rem;font-weight:800;letter-spacing:0.2em;text-transform:uppercase;color:#a29bfe;}
+.inv-top-bar .inv-label .num{font-family:'DM Serif Display',serif;font-size:1.5rem;color:#fff;line-height:1.1;}
+.inv-body{padding:28px 36px 0;flex:1;}
+.inv-parties{display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;margin-bottom:24px;padding-bottom:22px;border-bottom:1.5px solid #e4e4f0;}
+.inv-party-block .lbl{font-size:0.6rem;font-weight:800;letter-spacing:0.16em;text-transform:uppercase;color:#6c5ce7;margin-bottom:6px;}
+.inv-party-block .val{font-size:0.84rem;color:#1a1a2e;line-height:1.55;font-weight:500;}
+.inv-party-block .val strong{display:block;font-size:0.9rem;font-weight:700;}
+.inv-tbl{width:100%;border-collapse:collapse;}
+.inv-tbl thead tr{background:#f7f7fc;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.inv-tbl th{font-size:0.6rem;font-weight:800;letter-spacing:0.14em;text-transform:uppercase;color:#8888aa;padding:9px 12px;text-align:left;border-top:1.5px solid #e4e4f0;border-bottom:1.5px solid #e4e4f0;}
+.inv-tbl th:nth-child(2),.inv-tbl th:nth-child(3),.inv-tbl th:last-child{text-align:right;}
+.inv-tbl td{padding:10px 12px;font-size:0.84rem;color:#1a1a2e;border-bottom:1px solid #e4e4f0;vertical-align:middle;}
+.inv-tbl td:nth-child(2),.inv-tbl td:nth-child(3),.inv-tbl td:last-child{text-align:right;}
+.inv-tbl td:last-child{font-weight:700;}
+.inv-tbl tr:last-child td{border-bottom:none;}
+.inv-tbl td[colspan="4"]{background:#f7f0ff;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.date-chip{display:inline-block;background:#f0eeff;color:#6c5ce7;font-size:0.7rem;font-weight:700;padding:2px 7px;border-radius:4px;margin-right:6px;white-space:nowrap;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.desc-sub{font-size:0.78rem;color:#8888aa;}
+.inv-bottom{margin-top:auto;display:flex;justify-content:space-between;align-items:flex-end;padding:18px 36px 24px;border-top:1.5px solid #e4e4f0;background:#f7f7fc;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.inv-payment .lbl{font-size:0.6rem;font-weight:800;letter-spacing:0.14em;text-transform:uppercase;color:#8888aa;margin-bottom:5px;}
+.inv-payment .val{font-size:0.8rem;color:#3d3d5c;line-height:1.55;max-width:280px;}
+.inv-total-block{text-align:right;}
+.inv-total-block .lbl{font-size:0.6rem;font-weight:800;letter-spacing:0.14em;text-transform:uppercase;color:#8888aa;margin-bottom:4px;}
+.inv-total-block .amount{font-family:'DM Serif Display',serif;font-size:2rem;color:#1a1a2e;line-height:1;}
+.inv-total-block .amount .cur{font-size:0.9rem;font-family:'DM Sans',sans-serif;font-weight:600;color:#8888aa;margin-right:3px;}
+.inv-due-chip{display:inline-block;background:#fff8e6;color:#8a6200;font-size:0.68rem;font-weight:700;padding:3px 9px;border-radius:50px;margin-top:5px;border:1px solid #f0d890;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.inv-foot{background:#1a1a2e;padding:9px 36px;display:flex;justify-content:space-between;align-items:center;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.inv-foot .ft{font-size:0.68rem;color:rgba(255,255,255,0.3);}
+.inv-foot .ft-name{font-size:0.68rem;color:rgba(255,255,255,0.45);font-weight:600;}
+@media print{html,body{height:100%;}#invoice-wrap{min-height:100vh;}}
+</style>
+</head><body>
+<div id="invoice-wrap">${html}</div>
+<script>document.fonts.ready.then(function(){window.print();});<\/script>
+</body></html>`);
+  win.document.close();
+}
+
+
+function printReceipt() {
+  const inv = invoices.find(i => i.id === viewingInvId);
+  if (!inv) return;
+  printReceiptHTML(inv);
+}
+
+function buildReceiptHTML(inv) {
+  const s = settings;
+  const c = inv.client;
+  const allClients = inv.allClients || [c];
+  const paidFmt = inv.paidAt
+    ? new Date(inv.paidAt).toLocaleDateString('en-SG', { day: 'numeric', month: 'long', year: 'numeric' })
+    : new Date().toLocaleDateString('en-SG', { day: 'numeric', month: 'long', year: 'numeric' });
+  const rcptNum = 'RCT-' + inv.invNum.replace('INV-', '');
+  const billedName = (c.parent || c.name);
+  const studentNames = allClients.map(sc => sc.name).join(', ');
+  const rows = inv.lessons.map(l => {
+    const dateFmt = l.date ? new Date(l.date + 'T00:00:00').toLocaleDateString('en-SG', { day: 'numeric', month: 'short' }) : '';
+    const sc = allClients.find(x => x.id === l.studentId) || c;
+    const rateLabel = sc.rateType === 'session' ? 'session' : 'hr';
+    return `<tr>
+      <td>${dateFmt ? `<span class="rct-chip">${dateFmt}</span>` : ''} ${l.desc}</td>
+      <td>S$${l.rate.toFixed(2)}/${rateLabel}</td>
+      <td>${l.qty}</td>
+      <td>S$${(l.rate * l.qty).toFixed(2)}</td>
+    </tr>`;
+  }).join('');
+
+  return `
+  <div class="rct-header">
+    <div class="rct-from">
+      <div class="rct-name">${s.name || 'Trina Lee'}</div>
+      <div class="rct-role">Private Tutor${s.address ? ' · ' + s.address : ''}</div>
+    </div>
+    <div class="rct-badge">
+      <div class="rct-badge-label">Receipt</div>
+      <div class="rct-badge-num">${rcptNum}</div>
+    </div>
+  </div>
+
+  <div class="rct-stamp-row">
+    <div class="rct-stamp">✓ PAYMENT RECEIVED</div>
+    <div class="rct-date">Paid on ${paidFmt}</div>
+  </div>
+
+  <div class="rct-parties">
+    <div class="rct-party">
+      <div class="rct-lbl">Received From</div>
+      <div class="rct-val"><strong>${billedName}</strong>${c.contact ? '<br/>' + c.contact : ''}${c.address ? '<br/>' + c.address : ''}</div>
+    </div>
+    <div class="rct-party">
+      <div class="rct-lbl">For</div>
+      <div class="rct-val"><strong>${studentNames}</strong>${inv.monthLabel ? '<br/>' + inv.monthLabel : ''}</div>
+    </div>
+    <div class="rct-party" style="text-align:right;">
+      <div class="rct-lbl">Reference</div>
+      <div class="rct-val"><strong>${inv.invNum}</strong><br/>Invoice ref</div>
+    </div>
+  </div>
+
+  <table class="rct-tbl">
+    <thead><tr>
+      <th>Description</th>
+      <th style="text-align:right;">Rate</th>
+      <th style="text-align:right;">Qty</th>
+      <th style="text-align:right;">Amount</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>
+
+  <div class="rct-total-row">
+    <div class="rct-total-label">Total Received</div>
+    <div class="rct-total-amt">S$${inv.total.toFixed(2)}</div>
+  </div>
+
+  <div class="rct-footer">
+    <div class="rct-sig">
+      <div class="rct-sig-line"></div>
+      <div class="rct-sig-name">${s.name || 'Trina Lee'}</div>
+      <div class="rct-sig-role">Private Tutor</div>
+    </div>
+    <div class="rct-thankyou">Thank you for your prompt payment!</div>
+  </div>`;
+}
+
+function printReceiptHTML(inv) {
+  const html = buildReceiptHTML(inv);
+  const win = window.open('', '_blank', 'width=900,height=700');
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"/>
+<title>Receipt</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+@page{margin:0;size:A4;}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:100%;height:100%;background:#fff;font-family:'DM Sans',sans-serif;}
+#rct-wrap{width:100%;min-height:100vh;display:flex;flex-direction:column;padding:52px 56px;}
+.rct-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px;}
+.rct-name{font-family:'DM Serif Display',serif;font-size:1.6rem;color:#1a1a2e;}
+.rct-role{font-size:0.78rem;color:#8888aa;margin-top:3px;}
+.rct-badge{text-align:right;}
+.rct-badge-label{font-size:0.6rem;font-weight:800;letter-spacing:0.2em;text-transform:uppercase;color:#6c5ce7;}
+.rct-badge-num{font-family:'DM Serif Display',serif;font-size:1.6rem;color:#1a1a2e;line-height:1.1;}
+.rct-stamp-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;padding:14px 20px;background:#e0faf4;border-radius:10px;border:1.5px solid #00b894;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.rct-stamp{font-size:0.85rem;font-weight:800;color:#00845f;letter-spacing:0.08em;}
+.rct-date{font-size:0.82rem;color:#00845f;font-weight:600;}
+.rct-parties{display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;margin-bottom:28px;padding-bottom:24px;border-bottom:1.5px solid #e4e4f0;}
+.rct-lbl{font-size:0.6rem;font-weight:800;letter-spacing:0.16em;text-transform:uppercase;color:#6c5ce7;margin-bottom:6px;}
+.rct-val{font-size:0.84rem;color:#1a1a2e;line-height:1.6;font-weight:500;}
+.rct-val strong{display:block;font-size:0.9rem;font-weight:700;}
+.rct-tbl{width:100%;border-collapse:collapse;margin-bottom:0;}
+.rct-tbl thead tr{background:#f7f7fc;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.rct-tbl th{font-size:0.6rem;font-weight:800;letter-spacing:0.14em;text-transform:uppercase;color:#8888aa;padding:9px 12px;text-align:left;border-top:1.5px solid #e4e4f0;border-bottom:1.5px solid #e4e4f0;}
+.rct-tbl th:nth-child(2),.rct-tbl th:nth-child(3),.rct-tbl th:last-child{text-align:right;}
+.rct-tbl td{padding:10px 12px;font-size:0.84rem;color:#1a1a2e;border-bottom:1px solid #e4e4f0;vertical-align:middle;}
+.rct-tbl td:nth-child(2),.rct-tbl td:nth-child(3),.rct-tbl td:last-child{text-align:right;}
+.rct-tbl td:last-child{font-weight:700;}
+.rct-tbl tr:last-child td{border-bottom:none;}
+.rct-chip{display:inline-block;background:#f0eeff;color:#6c5ce7;font-size:0.7rem;font-weight:700;padding:2px 7px;border-radius:4px;margin-right:4px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.rct-total-row{display:flex;justify-content:flex-end;align-items:center;gap:20px;padding:16px 12px;border-top:2px solid #1a1a2e;margin-bottom:0;}
+.rct-total-label{font-size:0.75rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#8888aa;}
+.rct-total-amt{font-family:'DM Serif Display',serif;font-size:2rem;color:#1a1a2e;line-height:1;}
+.rct-footer{margin-top:auto;padding-top:40px;display:flex;justify-content:space-between;align-items:flex-end;}
+.rct-sig-line{width:160px;border-top:1.5px solid #1a1a2e;margin-bottom:6px;}
+.rct-sig-name{font-weight:700;font-size:0.88rem;color:#1a1a2e;}
+.rct-sig-role{font-size:0.75rem;color:#8888aa;}
+.rct-thankyou{font-size:0.82rem;color:#8888aa;font-style:italic;}
+@media print{#rct-wrap{min-height:100vh;}}
+</style>
+</head><body>
+<div id="rct-wrap">${html}</div>
+<script>document.fonts.ready.then(function(){window.print();});<\/script>
+</body></html>`);
+  win.document.close();
+}
+
+function printViewInv() {
+  const inv = invoices.find(i => i.id === viewingInvId);
+  if (!inv) return;
+  printInvoiceHTML(buildInvoiceHTML(inv));
+}
+
+function editInvoice() {
+  const inv = invoices.find(i => i.id === viewingInvId);
+  if (!inv) return;
+  closeViewInv();
+  showPage('new-invoice');
+
+  setTimeout(() => {
+    // Restore selected students
+    selectedStudentIds = inv.allClients ? inv.allClients.map(c => c.id) : [inv.clientId];
+    renderSelectedStudents();
+
+    // Restore invoice meta
+    document.getElementById('inv-number').value = inv.invNum;
+    if (inv.month) document.getElementById('inv-month').value = inv.month;
+    if (inv.due) document.getElementById('inv-due').value = inv.due;
+    document.getElementById('inv-notes').value = inv.notes || '';
+
+    // Restore lesson rows
+    const container = document.getElementById('lessons-container');
+    container.innerHTML = '';
+    inv.lessons.forEach(l => {
+      const c = (inv.allClients || [inv.client]).find(x => x.id === l.studentId) || inv.client;
+      const row = document.createElement('div');
+      row.className = 'lesson-row';
+      if (l.studentId) row.dataset.student = l.studentId;
+      const studentLabel = (selectedStudentIds.length > 1 && c) ? `<div style="grid-column:1/-1;padding-top:6px;padding-bottom:2px;"><span style="font-size:0.7rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.06em;">${c.name}</span></div>` : '';
+      row.innerHTML = `${studentLabel}
+        <input type="date" class="lesson-date" value="${l.date || ''}" oninput="calcTotal()"/>
+        <input type="text" class="lesson-desc" value="${l.desc || ''}" oninput="calcTotal()"/>
+        <input type="number" class="lesson-rate" value="${l.rate || ''}" min="0" step="5" style="text-align:right;width:90px;" oninput="calcTotal()"/>
+        <input type="number" class="lesson-qty" value="${l.qty || ''}" min="0" step="0.5" style="text-align:right;width:80px;" oninput="calcTotal()"/>
+        <button class="del-row" onclick="this.closest('.lesson-row').remove();calcTotal()">✕</button>`;
+      container.appendChild(row);
+    });
+
+    // Remove old saved invoice so it gets re-saved with edits
+    invoices = invoices.filter(i => i.id !== viewingInvId);
+    db.set('invoices', invoices);
+
+    calcTotal();
+    // Show a notice
+    toast('Invoice loaded for editing — save when done.');
+  }, 50);
+}
+
+function markPaid() {
+  const paidAt = new Date().toISOString();
+  invoices = invoices.map(i => i.id === viewingInvId ? { ...i, status: 'paid', paidAt } : i);
+  db.set('invoices', invoices);
+  renderHistory();
+  toast('Marked as paid! 🎉');
+  // Show the receipt banner right in the modal
+  document.getElementById('mark-paid-btn').textContent = '✓ Paid';
+  document.getElementById('mark-paid-btn').disabled = true;
+  document.getElementById('receipt-banner').style.display = 'flex';
+}
+
+function exportInvoicesCSV() {
+  if (invoices.length === 0) { toast('No invoices to export!'); return; }
+
+  // Which invoices to export — current filter or all
+  const getMonthKey = inv => inv.month || (inv.createdAt ? inv.createdAt.slice(0,7) : 'unknown');
+  const toExport = historyFilterMonth === 'all'
+    ? [...invoices]
+    : invoices.filter(i => getMonthKey(i) === historyFilterMonth);
+
+  if (toExport.length === 0) { toast('No invoices in this filter!'); return; }
+
+  // Build rows — one row per lesson line
+  const rows = [];
+  rows.push(['Invoice No.', 'Month', 'Date Issued', 'Due Date', 'Status', 'Student(s)', 'Parent', 'Lesson Date', 'Description', 'Rate (S$)', 'Hours/Qty', 'Line Total (S$)', 'Invoice Total (S$)']);
+
+  toExport.forEach(inv => {
+    const studentNames = inv.allClients ? inv.allClients.map(c => c.name).join(', ') : (inv.client ? inv.client.name : '');
+    const parent = inv.client ? (inv.client.parent || inv.client.name) : '';
+    const issued = inv.createdAt ? new Date(inv.createdAt).toLocaleDateString('en-SG') : '';
+    const due = inv.due ? new Date(inv.due + 'T00:00:00').toLocaleDateString('en-SG') : '';
+    const status = inv.status === 'paid' ? 'Paid' : 'Pending';
+
+    if (inv.lessons && inv.lessons.length > 0) {
+      inv.lessons.forEach((l, i) => {
+        const lessonDate = l.date ? new Date(l.date + 'T00:00:00').toLocaleDateString('en-SG') : '';
+        const lineTotal = (l.rate * l.qty).toFixed(2);
+        rows.push([
+          inv.invNum, inv.monthLabel || '', issued, due, status,
+          studentNames, parent,
+          lessonDate, l.desc || '', l.rate || '', l.qty || '',
+          lineTotal,
+          i === 0 ? inv.total.toFixed(2) : '' // only show total on first row
+        ]);
+      });
+    } else {
+      rows.push([inv.invNum, inv.monthLabel || '', issued, due, status, studentNames, parent, '', '', '', '', '', inv.total.toFixed(2)]);
+    }
+  });
+
+  // Convert to CSV string
+  const csv = rows.map(row =>
+    row.map(cell => {
+      const val = String(cell ?? '');
+      return val.includes(',') || val.includes('"') || val.includes('\n')
+        ? '"' + val.replace(/"/g, '""') + '"'
+        : val;
+    }).join(',')
+  ).join('\n');
+
+  // Download
+  const monthLabel = historyFilterMonth === 'all' ? 'All' : historyFilterMonth;
+  const filename = `Invoices_${monthLabel}_${new Date().toISOString().slice(0,10)}.csv`;
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  URL.revokeObjectURL(url);
+  toast(`✓ Exported ${toExport.length} invoice${toExport.length > 1 ? 's' : ''}!`);
+}
+
+// ── ATTENDANCE ──
+let attSessions = db.get('attSessions') || []; // [{date:'2026-05-07', studentId:'...', studentName:'...'}]
+let attSelectedStudent = null;
+let attYear = new Date().getFullYear();
+let attMonth = new Date().getMonth(); // 0-indexed
+
+function initAttendance() {
+  attSessions = db.get('attSessions') || [];
+  renderAttStudentPills();
+  renderAttCalendar();
+  renderAttSummary();
+  renderAttEarnings();
+}
+
+function renderAttStudentPills() {
+  const el = document.getElementById('att-student-pills');
+  if (clients.length === 0) {
+    el.innerHTML = '<span style="font-size:0.85rem;color:var(--muted);">No students yet — add them in My Students first.</span>';
+    return;
+  }
+  el.innerHTML = clients.map(c =>
+    `<div class="att-pill${attSelectedStudent === c.id ? ' selected' : ''}" onclick="attSelectStudent('${c.id}')">
+      ${c.name}${c.level ? ' <span style="opacity:.6;font-size:0.75rem;">· ' + c.level + '</span>' : ''}
+    </div>`
+  ).join('');
+}
+
+function attSelectStudent(id) {
+  attSelectedStudent = attSelectedStudent === id ? null : id;
+  renderAttStudentPills();
+  renderAttCalendar();
+}
+
+function attPrevMonth() {
+  attMonth--;
+  if (attMonth < 0) { attMonth = 11; attYear--; }
+  renderAttCalendar();
+  renderAttSummary();
+  renderAttEarnings();
+}
+
+function attNextMonth() {
+  attMonth++;
+  if (attMonth > 11) { attMonth = 0; attYear++; }
+  renderAttCalendar();
+  renderAttSummary();
+  renderAttEarnings();
+}
+
+function renderAttCalendar() {
+  const label = new Date(attYear, attMonth, 1).toLocaleDateString('en-SG', { month: 'long', year: 'numeric' });
+  document.getElementById('att-month-label').textContent = label;
+
+  const today = new Date();
+  const todayStr = today.toISOString().slice(0, 10);
+  const firstDay = new Date(attYear, attMonth, 1).getDay(); // 0=Sun
+  const daysInMonth = new Date(attYear, attMonth + 1, 0).getDate();
+
+  // Sessions this month keyed by date
+  const monthStr = `${attYear}-${String(attMonth + 1).padStart(2,'0')}`;
+  const sessionsByDate = {};
+  attSessions.filter(s => s.date.startsWith(monthStr)).forEach(s => {
+    if (!sessionsByDate[s.date]) sessionsByDate[s.date] = [];
+    sessionsByDate[s.date].push(s.studentId);
+  });
+
+  let html = '<div class="att-cal-grid">';
+  ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d => {
+    html += `<div class="att-cal-day-label">${d}</div>`;
+  });
+  // Empty cells
+  for (let i = 0; i < firstDay; i++) html += '<div class="att-cal-day empty"></div>';
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${attYear}-${String(attMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const studentsOnDay = sessionsByDate[dateStr] || [];
+    const isMarkedForSelected = attSelectedStudent && studentsOnDay.includes(attSelectedStudent);
+    const isMarkedForOther = !attSelectedStudent && studentsOnDay.length > 0;
+    const isToday = dateStr === todayStr;
+
+    let cls = 'att-cal-day';
+    if (isMarkedForSelected) cls += ' marked';
+    else if (!attSelectedStudent && studentsOnDay.length > 0) cls += ' marked';
+    else if (attSelectedStudent && studentsOnDay.length > 0) cls += ' other-student';
+    if (isToday && !isMarkedForSelected) cls += ' today';
+
+    const dot = studentsOnDay.length > 1 ? `<span style="position:absolute;bottom:4px;right:4px;font-size:0.55rem;opacity:.7;">${studentsOnDay.length}</span>` : '';
+    html += `<div class="${cls}" style="position:relative;" onclick="attToggleDate('${dateStr}')" title="${dateStr}">${d}${dot}</div>`;
+  }
+  html += '</div>';
+  document.getElementById('att-calendar').innerHTML = html;
+}
+
+function attDefaultHours(studentId) {
+  const c = clients.find(x => x.id === studentId);
+  if (!c) return 1.5;
+  return parseFloat(c.defaultHours) || 1.5;
+}
+
+function attToggleDate(dateStr) {
+  if (!attSelectedStudent) { toast('Pick a student first!'); return; }
+  const c = clients.find(x => x.id === attSelectedStudent);
+  const exists = attSessions.findIndex(s => s.date === dateStr && s.studentId === attSelectedStudent);
+  if (exists >= 0) {
+    attSessions.splice(exists, 1);
+  } else {
+    attSessions.push({ date: dateStr, studentId: attSelectedStudent, studentName: c ? c.name : 'Unknown', hours: attDefaultHours(attSelectedStudent) });
+  }
+  attSessions.sort((a, b) => a.date.localeCompare(b.date));
+  db.set('attSessions', attSessions);
+  renderAttCalendar();
+  renderAttSummary();
+  renderAttEarnings();
+}
+
+function renderAttSummary() {
+  const monthStr = `${attYear}-${String(attMonth + 1).padStart(2,'0')}`;
+  const monthLabel = new Date(attYear, attMonth, 1).toLocaleDateString('en-SG', { month: 'long', year: 'numeric' });
+  document.getElementById('att-summary-title').textContent = `Sessions — ${monthLabel}`;
+
+  const monthSessions = attSessions.filter(s => s.date.startsWith(monthStr));
+  const el = document.getElementById('att-summary-list');
+
+  if (monthSessions.length === 0) {
+    el.innerHTML = '<div style="color:var(--muted);font-size:0.85rem;padding:8px 0;">No sessions logged this month.</div>';
+    return;
+  }
+
+  // Group by student
+  const byStudent = {};
+  monthSessions.forEach(s => {
+    if (!byStudent[s.studentId]) byStudent[s.studentId] = { name: s.studentName, sessions: [] };
+    byStudent[s.studentId].sessions.push(s);
+  });
+
+  el.innerHTML = Object.entries(byStudent).map(([sid, data]) => `
+    <div style="margin-bottom:18px;">
+      <div style="font-weight:700;font-size:0.88rem;color:var(--accent);margin-bottom:8px;">${data.name} — ${data.sessions.length} session${data.sessions.length > 1 ? 's' : ''}</div>
+      <div style="display:grid;grid-template-columns:1fr auto auto;gap:6px 10px;align-items:center;">
+        <div style="font-size:0.65rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);">Date</div>
+        <div style="font-size:0.65rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-align:center;">Hours</div>
+        <div></div>
+        ${data.sessions.map(s => {
+          const fmt = new Date(s.date + 'T00:00:00').toLocaleDateString('en-SG', { weekday:'short', day:'numeric', month:'short' });
+          const hrs = s.hours !== undefined ? s.hours : attDefaultHours(s.studentId);
+          return `<span class="att-session-date">${fmt}</span>
+            <input type="number" value="${hrs}" min="0.5" max="8" step="0.5"
+              style="width:64px;border:1.5px solid var(--border);border-radius:8px;padding:5px 8px;font-family:inherit;font-size:0.85rem;font-weight:600;text-align:center;outline:none;"
+              onchange="attUpdateHours('${s.date}','${sid}',this.value)"
+              onfocus="this.style.borderColor='var(--accent)'"
+              onblur="this.style.borderColor='var(--border)'"
+            />
+            <button class="att-session-del" onclick="attDeleteSession('${s.date}','${sid}')" title="Remove">✕</button>`;
+        }).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function attUpdateHours(date, studentId, val) {
+  const hours = parseFloat(val) || 1;
+  const idx = attSessions.findIndex(s => s.date === date && s.studentId === studentId);
+  if (idx >= 0) {
+    attSessions[idx].hours = hours;
+    db.set('attSessions', attSessions);
+    renderAttEarnings();
+  }
+}
+
+function attDeleteSession(date, studentId) {
+  attSessions = attSessions.filter(s => !(s.date === date && s.studentId === studentId));
+  db.set('attSessions', attSessions);
+  renderAttCalendar();
+  renderAttSummary();
+  renderAttEarnings();
+}
+
+function renderAttEarnings() {
+  const monthStr = `${attYear}-${String(attMonth + 1).padStart(2,'0')}`;
+  const monthLabel = new Date(attYear, attMonth, 1).toLocaleDateString('en-SG', { month: 'long', year: 'numeric' });
+  const monthSessions = attSessions.filter(s => s.date.startsWith(monthStr));
+  const el = document.getElementById('att-earnings-list');
+
+  document.querySelector('#att-earnings-card > div:first-child > div:first-child').textContent = `💰 Estimated Earnings — ${monthLabel}`;
+
+  if (monthSessions.length === 0) {
+    el.innerHTML = '<div style="color:var(--muted);font-size:0.85rem;">No sessions logged this month.</div>';
+    return;
+  }
+
+  const byStudent = {};
+  monthSessions.forEach(s => {
+    if (!byStudent[s.studentId]) byStudent[s.studentId] = { name: s.studentName, sessions: [] };
+    byStudent[s.studentId].sessions.push(s);
+  });
+
+  let grandTotal = 0;
+  const rows = Object.entries(byStudent).map(([sid, data]) => {
+    const c = clients.find(x => x.id === sid);
+    const rate = c ? (parseFloat(c.rate) || 0) : 0;
+    const rateType = c ? (c.rateType || 'hr') : 'hr';
+    const totalHours = data.sessions.reduce((sum, s) => sum + (s.hours !== undefined ? s.hours : attDefaultHours(s.studentId)), 0);
+    const subtotal = rate * totalHours;
+    grandTotal += subtotal;
+    const noRate = rate === 0;
+    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);">
+      <div>
+        <div style="font-weight:700;font-size:0.88rem;color:var(--ink);">${data.name}</div>
+        <div style="font-size:0.78rem;color:var(--muted);margin-top:2px;">
+          ${totalHours}h total · ${data.sessions.length} session${data.sessions.length > 1 ? 's' : ''}
+          × ${noRate ? '<span style="color:var(--red);">no rate set</span>' : 'S$' + rate.toFixed(2) + '/' + rateType}
+        </div>
+      </div>
+      <div style="font-family:'DM Serif Display',serif;font-size:1.1rem;color:${noRate ? 'var(--muted)' : 'var(--ink)'};">
+        ${noRate ? '—' : 'S$' + subtotal.toFixed(2)}
+      </div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = rows + `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0 4px;">
+      <div style="font-size:0.72rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);">Total Estimated</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:1.6rem;color:var(--ink);">S$${grandTotal.toFixed(2)}</div>
+    </div>
+    <div style="font-size:0.75rem;color:var(--muted);margin-top:4px;">Edit hours per session in the Sessions list above.</div>`;
+}
+function loadSettings() {
+  document.getElementById('s-name').value = settings.name || 'Trina Lee';
+  document.getElementById('s-phone').value = settings.phone || '';
+  document.getElementById('s-email').value = settings.email || '';
+  document.getElementById('s-paynow').value = settings.paynow || '';
+  document.getElementById('s-address').value = settings.address || '';
+  document.getElementById('s-note').value = settings.note || '';
+}
+
+function saveSettings() {
+  settings = {
+    name: document.getElementById('s-name').value.trim() || 'Trina Lee',
+    phone: document.getElementById('s-phone').value.trim(),
+    email: document.getElementById('s-email').value.trim(),
+    paynow: document.getElementById('s-paynow').value.trim(),
+    address: document.getElementById('s-address').value.trim(),
+    note: document.getElementById('s-note').value.trim(),
+  };
+  db.set('settings', settings);
+  toast('Details saved!');
+}
+
+// ── INIT ──
+populateClientSelect();
+renderDashboard();
+</script>
+</body>
+</html>
